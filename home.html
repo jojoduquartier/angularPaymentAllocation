@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Credit Card Payment Allocation</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="node_modules/chart.js/dist/Chart.min.js"></script>
+    <script src="node_modules/angular-chart.js/dist/angular-chart.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <h1></h1>
+    <div ng-app="myApp" ng-controller="myCtrl" name="myForm" style="margin-left:15px;" ng-form>
+        <div class="row">
+            <div id="userinput" class="col-12 col-md-6">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Balance</th>
+                        <th>APR</th>
+                        <th>Minimum Payment</th>
+                        <th>Maximum Payment</th>
+                        <th>Current Payment</th>
+                    </tr>
+                    <!-- can easily have bounds since we have each property of the cards -->
+                    <tr ng-repeat="card in cards">
+                        <td><input ng-model="card.cardNickName" type="text" ng-required="true"></td>
+                        <td><input ng-model="card.cardBalance" min="0" type="number" ng-required="true"></td>
+                        <td><input ng-model="card.cardApr" type="number" ng-required="true" min="0" max="100"></td>
+                        <td><input ng-model="card.minPayment" min="0" type="number" ng-max="{{card.cardBalance}}"
+                                ng-required="true"></td>
+                        <td><input ng-model="card.maxPayment" type="number" ng-min="{{card.minPayment}}"
+                                ng-max="{{card.cardBalance}}"></td>
+                        <td><input ng-model="card.actualPayments" type="number" ng-min="{{card.minPayment}}"
+                                ng-max="{{card.cardBalance}}" ng-required="true"></td>
+                    </tr>
+                </table>
+
+                <br>
+
+                <div>
+                    <button ng-click="addCard()">New Card</button>
+                    <button ng-click="getData()">Get Optimal Payment</button>
+                </div>
+            </div>
+
+            <!-- Note that we bind the data and lebels here! so we could have many charts!! -->
+            <div class="row col-6 col-md-6 align-items-end">
+                <div class="col-md-3">
+                    <!-- current -->
+                    <canvas id="doughnut" class="chart chart-doughnut" chart-data="currentPaymentData"
+                        chart-labels="labels"></canvas>
+                </div>
+                <div class="col-md-3">
+                    <!-- suggested -->
+                    <canvas id="doughnut" class="chart chart-doughnut" chart-data="suggesteddata"
+                        chart-labels="labels"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <div ng-show="labels">
+            <div>
+                <select ng-model="selectedName" ng-options="label for label in labels"></select>
+            </div>
+            <br>
+            <p>Remaining Balance</p>
+            <br>
+            <div style="width: 80%">
+                <canvas id="bar" class="chart chart-bar" chart-data="specificSeriesData()" chart-labels="months"
+                    chart-series="series" chart-options="options" chart-click="onClick">
+                </canvas>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+<script type="text/javascript">
+    var app = angular.module('myApp', ["chart.js"]);
+    app.controller('myCtrl', function ($scope, $http) {
+        // initialize some cards
+        $scope.cards = [
+            { cardNickName: 'Prime', cardBalance: 1000, cardApr: 20, minPayment: 10, maxPayment: null, actualPayments: 500 },
+            { cardNickName: 'United', cardBalance: 2000, cardApr: 15, minPayment: 100, maxPayment: 1000, actualPayments: 500 }
+        ];
+
+        // The budget
+        $scope.budget = 1000;
+
+        // Add cards: TODO - user must have different nicknames for all cards
+        $scope.addCard = function () {
+            $scope.cards.push({ cardNickName: 'New', cardBalance: null, cardApr: null, minPayment: null, maxPayment: null });
+        };
+
+        // this is for the bar chart
+        $scope.onClick = function (points, evt) {
+            console.log(points, evt);
+        };
+
+        // this function will be used to get the proper data for the selected card
+        $scope.specificSeriesData = function () {
+            if ($scope.progressSeries) {
+                console.log($scope.progressSeries[$scope.selectedName].data);
+                return $scope.progressSeries[$scope.selectedName].data;
+            }
+        };
+
+        // this will get the optimal data solely for one month
+        $scope.getOptimal = function () {
+            var dataObj = {
+                budget: $scope.budget,
+                cards: $scope.cards
+            };
+
+            var url = 'http://127.0.0.1:8000/cards';
+
+            $http.post(url, dataObj).then(function (response) {
+
+                $scope.updatedData = response.data;
+                $scope.suggesteddata = response.data.updatedCards.map(x => x.suggestedPayment);
+                $scope.labels = response.data.updatedCards.map(x => x.cardNickName);
+                $scope.currentPaymentData = response.data.updatedCards.map(x => x.actualPayments);
+
+            }, function (error) {
+
+                console.log(error)
+
+            });
+        };
+
+        // this will get the next 13 months data. Obviously the stupid assumption of constant payment is bad
+        $scope.getProgress = function () {
+            var dataObj = {
+                budget: $scope.budget,
+                cards: $scope.cards
+            };
+
+            var url = 'http://127.0.0.1:8000/cards/12';
+
+            $http.post(url, dataObj).then(function (response) {
+
+                $scope.progressData = response.data;
+                $scope.months = response.data.progress[0].projection.map(x => Object.keys(x)[0]);
+                $scope.series = ["Minimum Payments", "Current Payments", "Suggested Payments"];
+                // complication - might want to have tabs so that user can actually select which card to use!
+                // tab names would be the card nicknames already bound to label
+                // so we can generate a dinctionay where key - card nickname and value is: array of 3 serries :)
+                var progress = response.data.progress;
+                var progressArray = {};
+
+                for (i = 0; i < progress.length; i++) {
+                    var thename = progress[i].cardNickName;
+                    var minArray = [];
+                    var currentArray = [];
+                    var suggestedArray = [];
+                    var projection = progress[i].projection;
+
+                    for (j = 0; j < projection.length; j++) {
+                        var vals = Object.keys(projection[j]).map(function (key) {
+                            return projection[j][key];
+                        });
+
+                        minArray.push(vals[0].nextBalanceOnMin);
+                        currentArray.push(vals[0].nextBalanceOnCurrentPayment);
+                        suggestedArray.push(vals[0].nextBalanceOnSuggested);
+                    };
+
+                    progressArray[thename] = {
+                        'cardNickName': thename,
+                        'data': [
+                            minArray,
+                            currentArray,
+                            suggestedArray
+                        ]
+                    };
+
+                    // progressArray.push({
+                    //     'cardNickName': thename,
+                    //     'data': [
+                    //         minArray,
+                    //         currentArray,
+                    //         suggestedArray
+                    //     ]
+                    // });
+                };
+
+                $scope.progressSeries = progressArray;
+                $scope.selectedName = $scope.labels[0];
+
+            }, function (error) {
+
+                console.log(error)
+
+            });
+        };
+
+        // this just brings together the two functions for that reach the API
+        $scope.getData = function () {
+            $scope.getOptimal();
+            $scope.getProgress();
+        };
+    });
+</script>
+
+</html>
