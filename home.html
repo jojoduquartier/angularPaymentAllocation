@@ -19,7 +19,11 @@
 
 <body>
     <h1></h1>
-    <div ng-app="myApp" ng-controller="myCtrl" name="myForm" style="margin-left:15px;" ng-form>
+    <div ng-app="myApp" ng-controller="myCtrl" name="myForm" style="margin-left:15px;margin-right:15px;">
+        <div>
+            <p>budget:</p><input ng-model="budget" type="text" ng-required="true" min="0">
+        </div>
+        <br>
         <div class="row">
             <div id="userinput" class="col-12 col-md-6">
                 <table>
@@ -70,9 +74,9 @@
 
         <br>
 
-        <div ng-show="labels">
+        <div ng-show="progressLabels">
             <div>
-                <select ng-model="selectedName" ng-options="label for label in labels"></select>
+                <select ng-model="selectedName" ng-options="label for label in progressLabels"></select>
             </div>
             <br>
             <p>Remaining Balance</p>
@@ -92,12 +96,12 @@
     app.controller('myCtrl', function ($scope, $http) {
         // initialize some cards
         $scope.cards = [
-            { cardNickName: 'Prime', cardBalance: 1000, cardApr: 20, minPayment: 10, maxPayment: null, actualPayments: 500 },
-            { cardNickName: 'United', cardBalance: 2000, cardApr: 15, minPayment: 100, maxPayment: 1000, actualPayments: 500 }
+            { cardNickName: 'Prime', cardBalance: 100, cardApr: 10, minPayment: 5, maxPayment: null, actualPayments: 10 },
+            { cardNickName: 'United', cardBalance: 200, cardApr: 15, minPayment: 7, maxPayment: null, actualPayments: 10 }
         ];
 
         // The budget
-        $scope.budget = 1000;
+        $scope.budget = 20;
 
         // Add cards: TODO - user must have different nicknames for all cards
         $scope.addCard = function () {
@@ -112,7 +116,6 @@
         // this function will be used to get the proper data for the selected card
         $scope.specificSeriesData = function () {
             if ($scope.progressSeries) {
-                console.log($scope.progressSeries[$scope.selectedName].data);
                 return $scope.progressSeries[$scope.selectedName].data;
             }
         };
@@ -152,6 +155,8 @@
             $http.post(url, dataObj).then(function (response) {
 
                 $scope.progressData = response.data;
+                $scope.progressLabels = $scope.labels.map(x => x);
+                $scope.progressLabels.push('TOTAL');
                 $scope.months = response.data.progress[0].projection.map(x => Object.keys(x)[0]);
                 $scope.series = ["Minimum Payments", "Current Payments", "Suggested Payments"];
                 // complication - might want to have tabs so that user can actually select which card to use!
@@ -159,6 +164,11 @@
                 // so we can generate a dinctionay where key - card nickname and value is: array of 3 serries :)
                 var progress = response.data.progress;
                 var progressArray = {};
+                var totalArray = [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // minArray
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // current
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // suggested
+                ];
 
                 for (i = 0; i < progress.length; i++) {
                     var thename = progress[i].cardNickName;
@@ -177,6 +187,11 @@
                         suggestedArray.push(vals[0].nextBalanceOnSuggested);
                     };
 
+                    // add the total
+                    totalArray[0] = [...minArray.keys()].map(k => totalArray[0][k] + minArray[k]);
+                    totalArray[1] = [...minArray.keys()].map(k => totalArray[1][k] + currentArray[k]);
+                    totalArray[2] = [...minArray.keys()].map(k => totalArray[2][k] + suggestedArray[k]);
+
                     progressArray[thename] = {
                         'cardNickName': thename,
                         'data': [
@@ -185,19 +200,14 @@
                             suggestedArray
                         ]
                     };
-
-                    // progressArray.push({
-                    //     'cardNickName': thename,
-                    //     'data': [
-                    //         minArray,
-                    //         currentArray,
-                    //         suggestedArray
-                    //     ]
-                    // });
                 };
 
+                progressArray['TOTAL'] = {
+                    'cardNickName': 'TOTAL',
+                    'data': totalArray
+                };
                 $scope.progressSeries = progressArray;
-                $scope.selectedName = $scope.labels[0];
+                $scope.selectedName = 'TOTAL';
 
             }, function (error) {
 
