@@ -19,75 +19,77 @@
 
 <body>
     <h1></h1>
-    <div ng-app="myApp" ng-controller="myCtrl" name="myForm" style="margin-left:15px;margin-right:15px;">
-        <div>
-            <p>budget:</p><input ng-model="budget" type="text" ng-required="true" min="0">
-        </div>
-        <br>
-        <div class="row">
-            <div id="userinput" class="col-12 col-md-6">
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Balance</th>
-                        <th>APR</th>
-                        <th>Minimum Payment</th>
-                        <th>Maximum Payment</th>
-                        <th>Current Payment</th>
-                    </tr>
-                    <!-- can easily have bounds since we have each property of the cards -->
-                    <tr ng-repeat="card in cards">
-                        <td><input ng-model="card.cardNickName" type="text" ng-required="true"></td>
-                        <td><input ng-model="card.cardBalance" min="0" type="number" ng-required="true"></td>
-                        <td><input ng-model="card.cardApr" type="number" ng-required="true" min="0" max="100"></td>
-                        <td><input ng-model="card.minPayment" min="0" type="number" ng-max="{{card.cardBalance}}"
-                                ng-required="true"></td>
-                        <td><input ng-model="card.maxPayment" type="number" ng-min="{{card.minPayment}}"
-                                ng-max="{{card.cardBalance}}"></td>
-                        <td><input ng-model="card.actualPayments" type="number" ng-min="{{card.minPayment}}"
-                                ng-max="{{card.cardBalance}}" ng-required="true"></td>
-                    </tr>
-                </table>
-
-                <br>
-
-                <div>
-                    <button ng-click="addCard()">New Card</button>
-                    <button ng-click="getData()">Get Optimal Payment</button>
-                </div>
-            </div>
-
-            <!-- Note that we bind the data and lebels here! so we could have many charts!! -->
-            <div class="row col-6 col-md-6 align-items-end">
-                <div class="col-md-3">
-                    <!-- current -->
-                    <canvas id="doughnut" class="chart chart-doughnut" chart-data="currentPaymentData"
-                        chart-labels="labels"></canvas>
-                </div>
-                <div class="col-md-3">
-                    <!-- suggested -->
-                    <canvas id="doughnut" class="chart chart-doughnut" chart-data="suggesteddata"
-                        chart-labels="labels"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <br>
-
-        <div ng-show="progressLabels">
+    <div class="container">
+        <div ng-app="myApp" ng-controller="myCtrl" name="myForm" style="margin-left:15px;margin-right:15px;">
             <div>
-                <select ng-model="selectedName" ng-options="label for label in progressLabels"></select>
+                <p>budget:</p><input ng-model="budget" type="text" ng-required="true" min="0">
             </div>
             <br>
-            <p>Remaining Balance</p>
-            <br>
-            <div style="width: 80%">
-                <canvas id="bar" class="chart chart-bar" chart-data="specificSeriesData()" chart-labels="months"
-                    chart-series="series" chart-options="options" chart-click="onClick">
-                </canvas>
-            </div>
-        </div>
+            <div class="row">
+                <div id="userinput" class="col big-box">
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Balance</th>
+                            <th>APR</th>
+                            <th>Minimum Payment</th>
+                            <th>Maximum Payment</th>
+                            <th>Current Payment</th>
+                        </tr>
+                        <!-- can easily have bounds since we have each property of the cards -->
+                        <tr ng-repeat="card in cards">
+                            <td><input ng-model="card.cardNickName" type="text" ng-required="true"></td>
+                            <td><input ng-model="card.cardBalance" min="0" type="number" ng-required="true"></td>
+                            <td><input ng-model="card.cardApr" type="number" ng-required="true" min="0" max="100"></td>
+                            <td><input ng-model="card.minPayment" min="0" type="number" ng-max="{{card.cardBalance}}"
+                                    ng-required="true"></td>
+                            <td><input ng-model="card.maxPayment" type="number" ng-min="{{card.minPayment}}"
+                                    ng-max="{{card.cardBalance}}"></td>
+                            <td><input ng-model="card.actualPayments" type="number" ng-min="{{card.minPayment}}"
+                                    ng-max="{{card.cardBalance}}" ng-required="true"></td>
+                        </tr>
+                    </table>
 
+                    <br>
+
+                    <div>
+                        <button ng-click="addCard()">New Card</button>
+                        <button ng-click="getData()">Get Optimal Payment</button>
+                    </div>
+                </div>
+
+                <!-- Note that we bind the data and lebels here! so we could have many charts!! -->
+                <div class="row">
+                    <div class="col mini-box">
+                        <!-- current -->
+                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="currentPaymentData"
+                            chart-labels="labels"></canvas>
+                    </div>
+                    <div class="col mini-box">
+                        <!-- suggested -->
+                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="suggesteddata"
+                            chart-labels="labels"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <div ng-show="progressLabels">
+                <div>
+                    <select ng-model="selectedName" ng-options="label for label in progressLabels"></select>
+                </div>
+                <br>
+                <p>Remaining Balance</p>
+                <br>
+                <div style="width: 80%">
+                    <canvas id="bar" class="chart chart-bar" chart-data="specificSeriesData()" chart-labels="months"
+                        chart-series="series" chart-options="options" chart-click="onClick">
+                    </canvas>
+                </div>
+            </div>
+
+        </div>
     </div>
 </body>
 
