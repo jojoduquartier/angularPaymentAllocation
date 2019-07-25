@@ -194,7 +194,11 @@
                 $scope.progressLabels = $scope.labels.map(x => x);
                 $scope.progressLabels.push('TOTAL');
                 $scope.months = response.data.progress[0].projection.map(x => Object.keys(x)[0]);
-                $scope.series = ["Minimum Payments", "Current Payments", "Suggested Payments"];
+                $scope.series = [
+                    "Remaining Balance on Minimum Payments",
+                    "Remaining Balance on Current Payments",
+                    "Remaining Balance on Suggested Payments"
+                ];
                 // complication - might want to have tabs so that user can actually select which card to use!
                 // tab names would be the card nicknames already bound to label
                 // so we can generate a dinctionay where key - card nickname and value is: array of 3 serries :)
