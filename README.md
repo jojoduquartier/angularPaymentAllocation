@@ -1,2 +1,2 @@
 # angularPaymentAllocation
-Complements the API
+[Optimal Payment Allocation](https://pymtallocation.herokuapp.com/index.html)
