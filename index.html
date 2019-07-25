@@ -59,16 +59,18 @@
                 </div>
 
                 <!-- Note that we bind the data and lebels here! so we could have many charts!! -->
-                <div class="row">
-                    <div class="col mini-box">
-                        <!-- current -->
-                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="currentPaymentData"
-                            chart-labels="labels"></canvas>
-                    </div>
-                    <div class="col mini-box">
-                        <!-- suggested -->
-                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="suggesteddata"
-                            chart-labels="labels"></canvas>
+                <div class="col">
+                    <div class="row">
+                        <div class="col mini-box">
+                            <!-- current -->
+                            <canvas id="doughnut" width="auto" height="auto" class="chart chart-doughnut"
+                                chart-data="currentPaymentData" chart-labels="labels"></canvas>
+                        </div>
+                        <div class="col mini-box">
+                            <!-- suggested -->
+                            <canvas id="doughnut" width="auto" height="auto" class="chart chart-doughnut"
+                                chart-data="suggesteddata" chart-labels="labels"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,8 +85,9 @@
                 <p>Remaining Balance</p>
                 <br>
                 <div style="width: 80%">
-                    <canvas id="bar" class="chart chart-bar" chart-data="specificSeriesData()" chart-labels="months"
-                        chart-series="series" chart-options="options" chart-click="onClick">
+                    <canvas id="bar" width="auto" height="auto" class="chart chart-bar"
+                        chart-data="specificSeriesData()" chart-labels="months" chart-series="series"
+                        chart-options="options" chart-click="onClick">
                     </canvas>
                 </div>
             </div>
