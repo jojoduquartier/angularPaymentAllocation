@@ -71,12 +71,12 @@
             <div class="col">
                 <!-- current -->
                 <canvas id="doughnut" width="auto" height="auto" class="chart chart-doughnut"
-                    chart-data="currentPaymentData" chart-labels="labels"></canvas>
+                    chart-data="currentPaymentData" chart-labels="labels" chart-options="currentPayOptions"></canvas>
             </div>
             <div class="col">
                 <!-- suggested -->
                 <canvas id="doughnut" width="auto" height="auto" class="chart chart-doughnut" chart-data="suggesteddata"
-                    chart-labels="labels"></canvas>
+                    chart-labels="labels" chart-options="suggestedPayOptions"></canvas>
             </div>
         </div>
 
@@ -92,7 +92,7 @@
                     <div class="row" style="width: 80%">
                         <canvas id="bar" width="auto" height="auto" class="chart chart-bar"
                             chart-data="specificSeriesData()" chart-labels="months" chart-series="series"
-                            chart-options="options" chart-click="onClick">
+                            chart-options="remainingBalanceOptions" chart-click="onClick">
                         </canvas>
                     </div>
                 </div>
@@ -144,6 +144,13 @@
             title: {
                 display: true,
                 text: 'Suggested Payment'
+            }
+        };
+
+        scope.remainingBalanceOptions = {
+            title: {
+                display: true,
+                text: 'Remaining Balance'
             }
         };
 
