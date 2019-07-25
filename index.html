@@ -81,7 +81,7 @@
         </div>
 
         <div ng-show="progressLabels" class="row">
-            <div>
+            <div class="row">
                 <select ng-model="selectedName" ng-options="label for label in progressLabels"></select>
             </div>
             <div class="card">
@@ -89,7 +89,7 @@
                     Remaining Balance
                 </div>
                 <div class="card-body">
-                    <div>
+                    <div class="row">
                         <canvas id="bar" width="auto" height="auto" class="chart chart-bar"
                             chart-data="specificSeriesData()" chart-labels="months" chart-series="series"
                             chart-options="remainingBalanceOptions" chart-click="onClick">
