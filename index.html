@@ -23,7 +23,18 @@
 </head>
 
 <body>
+
     <div ng-app="myApp" ng-controller="myCtrl" name="myForm" class="container" style="margin-top:1em;">
+        <span>
+            Ever Wondered if you should pay more towards a specific credit card and less towards another?
+            This tool provides the suggested payments that yield the lowest total balance across all cards.
+            Provide a budget and balances with minimum/maximum payment constraints and the budget is allocated
+            to the different cards accordingly.
+            Please read <a href="https://github.com/jojoduquartier/creditpaymentallocation/wiki">this wiki</a> for more
+            explanation.
+        </span>
+        <br>
+        <br>
         <div class="form-group row">
             <label for="budget" class="col-sm-1 col-form-label"><strong>Budget</strong> </label>
             <div class="col-sm-2">
@@ -99,6 +110,9 @@
             </div>
 
         </div>
+        <footer>
+            This is a one page webapp. <strong>No data is being collected</strong>
+        </footer>
 
     </div>
 </body>
