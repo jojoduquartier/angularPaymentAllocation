@@ -70,7 +70,8 @@
                     </tr>
                     <tr>
                         <td colspan="3"> <button class="btn btn-primary" ng-click="addCard()">New Card</button></td>
-                        <td colspan="3"><button class="btn btn-info" ng-click="getData()">Get Optimal Payment</button>
+                        <td colspan="3" align="right"><button class="btn btn-info" ng-click="getData()">Get Optimal
+                                Payment</button>
                         </td>
                     </tr>
                 </tbody>
@@ -131,7 +132,15 @@
 
         // Add cards: TODO - user must have different nicknames for all cards
         $scope.addCard = function () {
-            $scope.cards.push({ cardNickName: 'New', cardBalance: null, cardApr: null, minPayment: null, maxPayment: null });
+            $scope.cards.push(
+                {
+                    cardNickName: `Card ${$scope.cards.length}`,
+                    cardBalance: null,
+                    cardApr: null,
+                    minPayment: null,
+                    maxPayment: null
+                }
+            );
         };
 
         // this is for the bar chart
